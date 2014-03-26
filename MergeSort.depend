@@ -1,0 +1,14 @@
+# depslib dependency file v1.0
+1387350126 source:d:\myworkspace\codeblock\cbtemp\mergesort\mergesort.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"MergeSort.h"
+
+1387349527 d:\myworkspace\codeblock\cbtemp\mergesort\mergesort.h
+
+1387350029 source:d:\myworkspace\codeblock\cbtemp\mergesort\main.c
+	<stdio.h>
+	<stdlib.h>
+	"MergeSort.h"
+
