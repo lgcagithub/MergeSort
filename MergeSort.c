@@ -1,7 +1,10 @@
+#define _CRT_SECURE_NO_WARNINGS
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "MergeSort.h"
+
 
 int ReadDate(char* filename, int** pArrayOut,int* pNum)
 {
@@ -33,58 +36,59 @@ int ReadDate(char* filename, int** pArrayOut,int* pNum)
     return 1;
 }
 
-void MergeSort(int* pArray,int num)
+void Merge(int* pArray1, int num1, int* pArray2, int num2, int* pResult, int numr)
 {
-    int* pArrayA = NULL;
-    int numA = 0;
-    int* pArrayB = NULL;
-    int numB = 0;
+	int i = 0, j = 0, k = 0;
 
-    if(num > 1)
-    {
-        numA = num>>1;
-        pArrayA = (int*)malloc(sizeof(int)*numA);
-        numB = num - numA;
-        pArrayB = (int*)malloc(sizeof(int)*numB);
+	while (i < num1 && j < num2)
+	{
+		if (pArray1[i] < pArray2[j])
+		{
+			pResult[k] = pArray1[i]; i++;
+		}
+		else
+		{
+			pResult[k] = pArray2[j]; j++;
+		}
+		k++;
+	}
 
-        memcpy(pArrayA,pArray,sizeof(int)*numA);
-        memcpy(pArrayB,pArray+numA,sizeof(int)*numB);//!
-
-        MergeSort(pArrayA,numA);
-        MergeSort(pArrayB,numB);
-
-        Merge(pArrayA,numA,pArrayB,numB,pArray,num);
-
-        free(pArrayA);
-        free(pArrayB);
-    }
+	if (i < num1)
+	{
+		memcpy(pResult + k, pArray1 + i, sizeof(int)*(num1 - i));//!
+	}
+	else
+	{
+		memcpy(pResult + k, pArray2 + j, sizeof(int)*(num2 - j));//!
+	}
 }
 
-void Merge(int* pArray1,int num1,int* pArray2,int num2,int* pResult,int numr)
+void MergeSortInternal(int* pArray, int num, int* helperBuffer)
 {
-    int i = 0,j = 0,k = 0;
+	if (num <= 1) return;
 
-    while(i < num1 && j < num2)
-    {
-        if(pArray1[i] < pArray2[j])
-        {
-            pResult[k] = pArray1[i]; i++;
-        }
-        else
-        {
-            pResult[k] = pArray2[j]; j++;
-        }
-        k++;
-    }
+	int numA = num >> 1;
+	int* pArrayA = pArray;
+	int numB = num - numA;
+	int* pArrayB = pArray + numA;
 
-    if(i < num1)
-    {
-        memcpy(pResult+k,pArray1+i,sizeof(int)*(num1-i));//!
-    }
-    else
-    {
-        memcpy(pResult+k,pArray2+j,sizeof(int)*(num2-j));//!
-    }
+	MergeSortInternal(pArrayA, numA, helperBuffer);
+	MergeSortInternal(pArrayB, numB, helperBuffer + numA);
+
+	memcpy(helperBuffer, pArrayA, sizeof(int)*numA);
+	memcpy(helperBuffer + numA, pArrayB, sizeof(int)*numB);//!
+
+	Merge(helperBuffer, numA, helperBuffer + numA, numB, pArray, num);
+}
+
+void MergeSort(int* pArray,int num)
+{
+	//只分配一次内存，排序的时候不会递归动态分配内存，否则空间复杂度为nlog n
+	int* helperBuffer = (int*)malloc(sizeof(int) * num);
+
+	if(helperBuffer) MergeSortInternal(pArray, num, helperBuffer);
+
+	free(helperBuffer);
 }
 
 void PrintDate(int* pArray, int num)
